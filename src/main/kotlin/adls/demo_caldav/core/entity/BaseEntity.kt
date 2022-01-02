@@ -10,11 +10,7 @@ import javax.persistence.Id
 import javax.persistence.MappedSuperclass
 
 @MappedSuperclass
-open class BaseEntity<ID : Serializable> {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    open var id: ID? = null
-
+open class BaseEntity {
     @UpdateTimestamp
     var updatedAt: ZonedDateTime? = ZonedDateTime.now()
 
