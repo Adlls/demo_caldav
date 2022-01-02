@@ -44,6 +44,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-jdbc")
 	implementation("org.mapstruct:mapstruct:1.4.1.Final")
 	implementation("org.mnode.ical4j:ical4j:2.0.5")
+	implementation("com.github.caldav4j:caldav4j:1.0.1")
 	kapt("org.mapstruct:mapstruct-processor:1.4.1.Final")
 	implementation("org.springframework.boot:spring-boot-starter-integration")
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
