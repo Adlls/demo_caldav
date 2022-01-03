@@ -5,7 +5,6 @@ import adls.demo_caldav.auth_token.entity.AuthToken
 import adls.demo_caldav.auth_token.entity.AuthType
 import adls.demo_caldav.auth_token.entity.SourceType
 import adls.demo_caldav.auth_token.service.AuthTokenService
-import adls.demo_caldav.auth_token.service.YandexTokenService
 import adls.demo_caldav.calendar.entity.ImportedCalendar
 import adls.demo_caldav.calendar.repository.ImportedCalendarRepository
 import adls.demo_caldav.calendar.service.ImportCalendarService
@@ -30,7 +29,7 @@ class ImportCalendarServiceImpl(
         password: String
     ) {
         val currentUser = userService.findByIdOrThrow(userId)
-        require(!repository.existsByUserAndCaldavUrl(currentUser, caldavUrl)) {
+        require(!repository.existsByAuthTokenUserAndCaldavUrl(currentUser, caldavUrl)) {
             "CalDav url already exist for user id $userId"
         }
         authTokenService.save(
@@ -43,11 +42,11 @@ class ImportCalendarServiceImpl(
                 externalServiceType = AuthServiceType.CALDAV,
                 user = currentUser
             )
-        ).also {
+        ).also { authToken ->
             save(
                 ImportedCalendar(
                     caldavUrl = caldavUrl,
-                    user = currentUser
+                    authToken = authToken
                 )
             )
         }

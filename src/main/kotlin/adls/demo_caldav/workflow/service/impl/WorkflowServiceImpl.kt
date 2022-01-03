@@ -12,7 +12,9 @@ import java.time.ZonedDateTime
 class WorkflowServiceImpl:
     BaseServiceImpl<Long, WorkflowItem, WorkflowItemRepository>(),
     WorkflowService {
-    override fun getWorkflowItemsBetweenDates(startDate: ZonedDateTime, endDate: ZonedDateTime): List<WorkflowItemVO> {
+    override fun getWorkflowItemsBetweenDates(
+        startDate: ZonedDateTime,
+        endDate: ZonedDateTime): List<WorkflowItemVO> {
         TODO("Not yet implemented")
     }
 }

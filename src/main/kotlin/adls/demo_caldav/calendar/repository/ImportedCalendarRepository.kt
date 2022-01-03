@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface ImportedCalendarRepository: BaseRepository<ImportedCalendar, Long> {
-    fun existsByUserAndCaldavUrl(user: User, caldavUrl: String): Boolean
+    fun existsByAuthTokenUserAndCaldavUrl(user: User, caldavUrl: String): Boolean
 }
