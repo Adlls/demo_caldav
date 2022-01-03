@@ -9,6 +9,5 @@ data class WorkflowItemVO(
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.msZ")
     var dateSpentEnd: ZonedDateTime? = null,
     var title: String? = null,
-    var description: String? = null,
-    var externalUrl: String? = null
+    var description: String? = null
 )

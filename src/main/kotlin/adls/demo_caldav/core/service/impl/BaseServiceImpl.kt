@@ -12,7 +12,7 @@ import java.util.*
 import javax.persistence.EntityNotFoundException
 
 @Suppress("SpringJavaInjectionPointsAutowiringInspection")
-abstract class BaseServiceImpl<ID : Serializable, E : BaseEntity<ID>, R : BaseRepository<E, ID>> :
+abstract class BaseServiceImpl<ID : Serializable, E : BaseEntity, R : BaseRepository<E, ID>> :
     BaseService<ID, E, R> {
 
     @Autowired

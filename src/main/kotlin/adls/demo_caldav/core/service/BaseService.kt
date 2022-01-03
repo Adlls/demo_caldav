@@ -8,7 +8,7 @@ import java.io.Serializable
 import java.util.*
 import javax.persistence.EntityNotFoundException
 
-interface BaseService<ID : Serializable, E : BaseEntity<ID>, R : BaseRepository<E, ID>> {
+interface BaseService<ID : Serializable, E : BaseEntity, R : BaseRepository<E, ID>> {
     fun findAll(): MutableIterable<E>
     fun findAllPageable(pageable: Pageable): Page<E>
     fun findById(id: ID): Optional<E>

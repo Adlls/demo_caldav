@@ -6,6 +6,6 @@ import org.springframework.data.repository.NoRepositoryBean
 import java.io.Serializable
 
 @NoRepositoryBean
-interface BaseRepository<E : BaseEntity<ID>, ID : Serializable> : JpaRepository<E, ID> {
+interface BaseRepository<E : BaseEntity, ID : Serializable> : JpaRepository<E, ID> {
     fun findAllByIdIn(ids: Iterable<ID>): List<E>
 }
