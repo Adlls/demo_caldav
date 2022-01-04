@@ -10,4 +10,6 @@ import org.springframework.stereotype.Service
 class AuthTokenServiceImpl:
     BaseServiceImpl<Long, AuthToken, AuthTokenRepository>(),
     AuthTokenService {
+    override fun getTokenCaldavByUserIdAndSourceTypeIsBasic(userId: Long): String =
+        repository.findTokenCalDavBySourceTypeIsYandexAndAuthTypeIsBasic(userId)
 }

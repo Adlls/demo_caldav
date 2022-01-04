@@ -3,9 +3,7 @@ package adls.demo_caldav.workflow.controller
 import adls.demo_caldav.workflow.service.WorkflowService
 import adls.demo_caldav.workflow.vo.WorkflowItemVO
 import org.springframework.validation.annotation.Validated
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.time.ZonedDateTime
 
 @RestController
@@ -15,9 +13,10 @@ class WorkflowController(
     private val workflowService: WorkflowService
 ) {
 
-    @GetMapping
+    @GetMapping("{userId}")
     fun getWorkflowItemsByDates(
-        startDate: ZonedDateTime,
-        endDate: ZonedDateTime): List<WorkflowItemVO> =
-        workflowService.getWorkflowItemsBetweenDates(startDate, endDate)
+        @RequestParam startDate: ZonedDateTime,
+        @RequestParam endDate: ZonedDateTime,
+        @PathVariable userId: Long): List<WorkflowItemVO> =
+        workflowService.getWorkflowItemsBetweenDates(startDate, endDate, userId)
 }
