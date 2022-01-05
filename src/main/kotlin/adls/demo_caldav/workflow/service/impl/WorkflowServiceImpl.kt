@@ -7,7 +7,8 @@ import adls.demo_caldav.core.service.impl.BaseServiceImpl
 import adls.demo_caldav.workflow.entity.WorkflowItem
 import adls.demo_caldav.workflow.repository.WorkflowItemRepository
 import adls.demo_caldav.workflow.service.WorkflowService
-import adls.demo_caldav.workflow.service.factory_workflow_item.impl.WorkflowItemVOSingleFactory
+import adls.demo_caldav.workflow.service.factory_workflow_item.WorkflowItemVOFactory
+import adls.demo_caldav.workflow.service.factory_workflow_item.impl.WorkflowItemVOFactoryImpl
 import adls.demo_caldav.workflow.vo.WorkflowItemVO
 import net.fortuna.ical4j.model.DateTime
 import net.fortuna.ical4j.model.component.VEvent
@@ -18,7 +19,7 @@ import java.util.*
 @Service
 class WorkflowServiceImpl(
     private val caldavRequest: CaldavRequest,
-    private val workflowItemVOSingleFactory: WorkflowItemVOSingleFactory,
+    private val workflowItemVOFactory: WorkflowItemVOFactory,
     private val importCalendarService: ImportCalendarService
 ):
     BaseServiceImpl<Long, WorkflowItem, WorkflowItemRepository>(),
@@ -54,7 +55,7 @@ class WorkflowServiceImpl(
             )
         }
        return vEvents.map {
-            workflowItemVOSingleFactory.getWorkflowItemVO(it)
+            workflowItemVOFactory.getWorkflowItemVO(it)
         }
     }
 }
