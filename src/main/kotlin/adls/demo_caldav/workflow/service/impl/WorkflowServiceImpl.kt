@@ -42,9 +42,9 @@ class WorkflowServiceImpl(
         endDate: DateTime,
         importedCalendars: List<ImportedCalendar>
     ): List<WorkflowItemVO> {
-        val vEvents = listOf<VEvent>()
+        var vEvents = listOf<VEvent>()
         importedCalendars.forEach {
-            vEvents.plus(
+            vEvents = vEvents.plus(
                 caldavRequest.getItemEventsByDates(
                     startDate,
                     endDate,
@@ -53,7 +53,7 @@ class WorkflowServiceImpl(
                 )
             )
         }
-        return vEvents.map {
+       return vEvents.map {
             workflowItemVOSingleFactory.getWorkflowItemVO(it)
         }
     }
