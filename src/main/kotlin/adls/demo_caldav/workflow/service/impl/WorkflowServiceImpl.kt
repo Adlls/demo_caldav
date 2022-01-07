@@ -8,7 +8,6 @@ import adls.demo_caldav.workflow.entity.WorkflowItem
 import adls.demo_caldav.workflow.repository.WorkflowItemRepository
 import adls.demo_caldav.workflow.service.WorkflowService
 import adls.demo_caldav.workflow.service.factory_workflow_item.WorkflowItemVOFactory
-import adls.demo_caldav.workflow.service.factory_workflow_item.impl.WorkflowItemVOFactoryImpl
 import adls.demo_caldav.workflow.vo.WorkflowItemVO
 import net.fortuna.ical4j.model.DateTime
 import net.fortuna.ical4j.model.component.VEvent
@@ -33,29 +32,34 @@ class WorkflowServiceImpl(
             importCalendarService
                 .findAllImportedCalendarByUserId(userId)
         return initVEvents(
-            DateTime(Date.from(startDate.toInstant())),
-            DateTime(Date.from(endDate.toInstant())),
+            startDate,
+            endDate,
             currentImportedCalendars)
     }
 
     private fun initVEvents(
-        startDate: DateTime,
-        endDate: DateTime,
+        startDate: ZonedDateTime,
+        endDate: ZonedDateTime,
         importedCalendars: List<ImportedCalendar>
     ): List<WorkflowItemVO> {
         var vEvents = listOf<VEvent>()
+        var listOfWorkflowItemsVO = mutableListOf<WorkflowItemVO>()
         importedCalendars.forEach {
             vEvents = vEvents.plus(
                 caldavRequest.getItemEventsByDates(
-                    startDate,
-                    endDate,
+                    DateTime(Date.from(startDate.toInstant())),
+                    DateTime(Date.from(endDate.toInstant())),
                     checkNotNull(it.authToken),
                     checkNotNull(it.caldavUrl)
                 )
             )
         }
-       return vEvents.map {
-            workflowItemVOFactory.getWorkflowItemVO(it)
+        println(vEvents)
+        vEvents.forEach {
+          listOfWorkflowItemsVO = listOfWorkflowItemsVO
+               .plus(workflowItemVOFactory.getWorkflowItemsVO(it, startDate, endDate))
+              .toMutableList()
         }
+        return listOfWorkflowItemsVO.sortedBy { it.dateSpentStart }
     }
 }

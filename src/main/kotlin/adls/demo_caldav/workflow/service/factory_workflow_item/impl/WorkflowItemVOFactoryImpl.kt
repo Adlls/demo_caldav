@@ -6,13 +6,23 @@ import adls.demo_caldav.workflow.service.factory_workflow_item.WorkflowItemVOFac
 import adls.demo_caldav.workflow.vo.WorkflowItemVO
 import net.fortuna.ical4j.model.component.VEvent
 import org.springframework.stereotype.Component
+import java.time.ZonedDateTime
 
 @Component
 class WorkflowItemVOFactoryImpl: WorkflowItemVOFactory {
 
 
-    override fun getWorkflowItemVO(vEvent: VEvent): WorkflowItemVO {
+    override fun getWorkflowItemsVO(
+        vEvent: VEvent,
+        startDate: ZonedDateTime,
+        endDate: ZonedDateTime
+    ): List<WorkflowItemVO> {
         val workflowItemVO = WorkflowItemVO()
+        return WorkflowItemVOMeetDecorator(workflowItemVO).let { meetDecorator ->
+            meetDecorator.setEventsProperties(vEvent, startDate, endDate)
+            meetDecorator.getWorkflowItemsVO(vEvent)
+        }
+        /*
         return WorkflowItemVOTaskDecorator(
             workflowItemVO
         ).let { taskDecorator ->
@@ -20,10 +30,11 @@ class WorkflowItemVOFactoryImpl: WorkflowItemVOFactory {
             taskDecorator.getWorkflowItemVO()
         }.also {
             WorkflowItemVOMeetDecorator(it).let { meetDecorator ->
-                meetDecorator.setVEvent(vEvent)
+                meetDecorator.setEventsProperties(vEvent, startDate, endDate)
                 meetDecorator.setWorkflowItemVOProperties()
-                meetDecorator.getWorkflowItemVO()
+                meetDecorator.getWorkflowItemsVO(vEvent)
             }
         }
+        */
     }
 }
