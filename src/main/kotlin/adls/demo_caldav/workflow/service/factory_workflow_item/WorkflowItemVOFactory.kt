@@ -6,7 +6,7 @@ import java.time.ZonedDateTime
 
 interface WorkflowItemVOFactory {
     fun getWorkflowItemsVO(
-        vEvent: VEvent,
+        vEvents: List<VEvent>,
         startDate: ZonedDateTime,
         endDate: ZonedDateTime): List<WorkflowItemVO>
 }

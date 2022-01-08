@@ -43,7 +43,7 @@ class WorkflowServiceImpl(
         importedCalendars: List<ImportedCalendar>
     ): List<WorkflowItemVO> {
         var vEvents = listOf<VEvent>()
-        var listOfWorkflowItemsVO = mutableListOf<WorkflowItemVO>()
+        //var listOfWorkflowItemsVO = mutableListOf<WorkflowItemVO>()
         importedCalendars.forEach {
             vEvents = vEvents.plus(
                 caldavRequest.getItemEventsByDates(
@@ -54,12 +54,14 @@ class WorkflowServiceImpl(
                 )
             )
         }
-        println(vEvents)
+        return workflowItemVOFactory.getWorkflowItemsVO(vEvents, startDate, endDate)
+        /*
         vEvents.forEach {
           listOfWorkflowItemsVO = listOfWorkflowItemsVO
                .plus(workflowItemVOFactory.getWorkflowItemsVO(it, startDate, endDate))
               .toMutableList()
         }
         return listOfWorkflowItemsVO.sortedBy { it.dateSpentStart }
+         */
     }
 }

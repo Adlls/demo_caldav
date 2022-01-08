@@ -53,11 +53,14 @@ class WorkflowItemVOMeetDecorator(
             ).withFixedOffsetZone()
         }
 
-    fun getWorkflowItemsVO(vEvent: VEvent): List<WorkflowItemVO> {
+    fun getWorkflowItemsVO(
+        vEvent: VEvent,
+        recurVEvents: List<VEvent>
+    ): List<WorkflowItemVO> {
         var listOfWorkflowItemVO = mutableListOf<WorkflowItemVO>()
         return if (vEvent.getProperty<RRule>(Property.RRULE)?.recur != null) {
             listOfWorkflowItemVO = listOfWorkflowItemVO
-                .plus(getRecurrenceEvents(vEvent))
+                .plus(getRecurrenceEvents(vEvent, recurVEvents))
                 .toMutableList()
             return listOfWorkflowItemVO
         } else {
@@ -68,7 +71,50 @@ class WorkflowItemVOMeetDecorator(
         }
     }
 
-    private fun getRecurrenceEvents(vEvent: VEvent): List<WorkflowItemVO> {
+    private fun setRecurEventToWorkflowItemVO(
+        replacementEvent: VEvent?,
+        targetEvent: VEvent,
+        targetDate: Date
+    ): WorkflowItemVO {
+       val setEvent = replacementEvent ?: targetEvent
+       val targetStartDate = if (replacementEvent != null) {
+           replacementEvent.startDate.date.toInstant().atZone(
+               replacementEvent.startDate.timeZone.toZoneId()
+           ).withFixedOffsetZone()
+       } else {
+           targetDate.toInstant().atZone(
+               setEvent.startDate.timeZone.toZoneId()
+           )
+               .withFixedOffsetZone()
+               .withHour(setEvent.startDate.date.hours)
+               .withMinute(setEvent.startDate.date.minutes)
+               .withSecond(setEvent.startDate.date.seconds)
+       }
+        val targetEndDate = if (replacementEvent != null) {
+            replacementEvent.endDate.date.toInstant().atZone(
+                replacementEvent.endDate.timeZone.toZoneId()
+            ).withFixedOffsetZone()
+        } else {
+            targetDate.toInstant().atZone(
+                setEvent.endDate.timeZone.toZoneId()
+            )
+                .withFixedOffsetZone()
+                .withHour(setEvent.endDate.date.hours)
+                .withMinute(setEvent.endDate.date.minutes)
+                .withSecond(setEvent.endDate.date.seconds)
+        }
+       return WorkflowItemVO(
+            dateSpentStart = targetStartDate,
+            dateSpentEnd = targetEndDate,
+            title = setEvent.summary?.value,
+            description = setEvent.description?.value
+        )
+    }
+
+    private fun getRecurrenceEvents(
+        vEvent: VEvent,
+        recurVEvents: List<VEvent>
+    ): List<WorkflowItemVO> {
         val vEventWithRules = vEvent.getProperty<RRule>(Property.RRULE)?.recur
         val listOfWorkflowItemVO = mutableListOf<WorkflowItemVO>()
         return if (vEventWithRules != null) {
@@ -78,25 +124,21 @@ class WorkflowItemVOMeetDecorator(
                 Value.DATE_TIME
             )
             dateList.forEach {
+                val replacementEvent = recurVEvents.find { recurEvent ->
+                    recurEvent.uid.value == vEvent.uid.value
+                            && recurEvent.recurrenceId.date.toInstant().atZone(
+                        vEvent.startDate.timeZone.toZoneId()
+                    ).withFixedOffsetZone()
+                        .withHour(0)
+                        .withMinute(0)
+                        .withSecond(0) == it.toInstant().atZone(
+                        vEvent.startDate.timeZone.toZoneId()
+                    ).withFixedOffsetZone()
+                        .withHour(0)
+                }
+                println(" repl $replacementEvent")
                 listOfWorkflowItemVO.add(
-                    WorkflowItemVO(
-                        dateSpentStart = it.toInstant().atZone(
-                            vEvent.startDate.timeZone.toZoneId()
-                        )
-                            .withFixedOffsetZone()
-                            .withHour(vEvent.startDate.date.hours)
-                            .withMinute(vEvent.startDate.date.minutes)
-                            .withSecond(vEvent.startDate.date.seconds),
-                        dateSpentEnd = it.toInstant().atZone(
-                            vEvent.endDate.timeZone.toZoneId()
-                        )
-                            .withFixedOffsetZone()
-                            .withHour(vEvent.endDate.date.hours)
-                            .withMinute(vEvent.endDate.date.minutes)
-                            .withSecond(vEvent.endDate.date.seconds),
-                        title = vEvent.summary?.value,
-                        description = vEvent.description?.value
-                    )
+                    setRecurEventToWorkflowItemVO(replacementEvent, vEvent, it)
                 )
             }
             listOfWorkflowItemVO
