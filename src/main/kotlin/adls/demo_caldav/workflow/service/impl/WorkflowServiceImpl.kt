@@ -10,7 +10,10 @@ import adls.demo_caldav.workflow.service.WorkflowService
 import adls.demo_caldav.workflow.service.factory_workflow_item.WorkflowItemVOFactory
 import adls.demo_caldav.workflow.vo.WorkflowItemVO
 import net.fortuna.ical4j.model.DateTime
+import net.fortuna.ical4j.model.Property
 import net.fortuna.ical4j.model.component.VEvent
+import net.fortuna.ical4j.model.property.ExDate
+import net.fortuna.ical4j.model.property.RRule
 import org.springframework.stereotype.Service
 import java.time.ZonedDateTime
 import java.util.*
@@ -42,17 +45,21 @@ class WorkflowServiceImpl(
         endDate: ZonedDateTime,
         importedCalendars: List<ImportedCalendar>
     ): List<WorkflowItemVO> {
-        var vEvents = listOf<VEvent>()
+        var vEvents = mutableListOf<VEvent>()
         //var listOfWorkflowItemsVO = mutableListOf<WorkflowItemVO>()
         importedCalendars.forEach {
-            vEvents = vEvents.plus(
-                caldavRequest.getItemEventsByDates(
-                    DateTime(Date.from(startDate.toInstant())),
-                    DateTime(Date.from(endDate.toInstant())),
-                    checkNotNull(it.authToken),
-                    checkNotNull(it.caldavUrl)
-                )
-            )
+                vEvents = vEvents.plus(
+                    caldavRequest.getItemEventsByDates(
+                        DateTime(Date.from(startDate.toInstant())),
+                        DateTime(Date.from(endDate.toInstant())),
+                        checkNotNull(it.authToken),
+                        checkNotNull(it.caldavUrl)
+                    )
+                ).toMutableList()
+        }
+        vEvents.removeIf {
+            it.getProperty<RRule>(Property.RRULE)?.recur == null
+            && !it.startDate.date.after(Date.from(startDate.toInstant()))
         }
         return workflowItemVOFactory.getWorkflowItemsVO(vEvents, startDate, endDate)
         /*

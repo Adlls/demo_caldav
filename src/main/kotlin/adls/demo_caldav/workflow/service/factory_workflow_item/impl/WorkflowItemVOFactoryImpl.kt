@@ -11,7 +11,6 @@ import java.util.*
 @Component
 class WorkflowItemVOFactoryImpl: WorkflowItemVOFactory {
 
-
     fun getRecurVEvents(
         vEvents: List<VEvent>,
         startDate: ZonedDateTime,

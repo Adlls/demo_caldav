@@ -2,9 +2,11 @@ package adls.demo_caldav.workflow.service.decorator_workflow_item.impl
 
 import adls.demo_caldav.workflow.vo.WorkflowItemVO
 import net.fortuna.ical4j.model.Date
+import net.fortuna.ical4j.model.DateTime
 import net.fortuna.ical4j.model.Property
 import net.fortuna.ical4j.model.component.VEvent
 import net.fortuna.ical4j.model.parameter.Value
+import net.fortuna.ical4j.model.property.ExDate
 import net.fortuna.ical4j.model.property.RRule
 import java.time.ZonedDateTime
 
@@ -75,7 +77,7 @@ class WorkflowItemVOMeetDecorator(
         replacementEvent: VEvent?,
         targetEvent: VEvent,
         targetDate: Date
-    ): WorkflowItemVO {
+    ): WorkflowItemVO? {
        val setEvent = replacementEvent ?: targetEvent
        val targetStartDate = if (replacementEvent != null) {
            replacementEvent.startDate.date.toInstant().atZone(
@@ -90,6 +92,13 @@ class WorkflowItemVOMeetDecorator(
                .withMinute(setEvent.startDate.date.minutes)
                .withSecond(setEvent.startDate.date.seconds)
        }
+        if (setEvent
+                .getProperty<ExDate>(Property.EXDATE)
+                ?.dates?.contains(DateTime(Date.from(targetStartDate.toInstant()))) == true
+        ) {
+            return null
+        }
+
         val targetEndDate = if (replacementEvent != null) {
             replacementEvent.endDate.date.toInstant().atZone(
                 replacementEvent.endDate.timeZone.toZoneId()
@@ -136,10 +145,9 @@ class WorkflowItemVOMeetDecorator(
                     ).withFixedOffsetZone()
                         .withHour(0)
                 }
-                println(" repl $replacementEvent")
-                listOfWorkflowItemVO.add(
-                    setRecurEventToWorkflowItemVO(replacementEvent, vEvent, it)
-                )
+                setRecurEventToWorkflowItemVO(replacementEvent, vEvent, it)?.let { workflow ->
+                    listOfWorkflowItemVO.add(workflow)
+                }
             }
             listOfWorkflowItemVO
 
